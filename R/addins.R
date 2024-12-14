@@ -37,7 +37,7 @@ roundtrip_active_file <- function() {
     type = "roundtrip", dir = tempdir(),
     overwrite = TRUE
   )
-  rstudioapi::setDocumentContents(readfile(rfile), active_file$id)
+  rstudioapi::setDocumentContents(brio::read_file(x), active_file$id)
   rstudioapi::setCursorPosition(cursor_position, active_file$id)
 }
 
@@ -57,7 +57,7 @@ dedoc_to_active_file <- function(docx = NULL, showdiff = TRUE) {
     )
   }
   tmprmd <- dedoc(docx, dir = tempdir(), overwrite = TRUE)
-  rstudioapi::setDocumentContents(readfile(tmprmd), active_file$id)
+  rstudioapi::setDocumentContents(brio::read_file(tmprmd), active_file$id)
   rstudioapi::setCursorPosition(cursor_position, active_file$id)
   if (showdiff) {
     print(

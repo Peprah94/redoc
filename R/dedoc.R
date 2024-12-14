@@ -92,7 +92,7 @@ Returning markdown only. Alternate data may be provided via `orig_codefile or `o
     md <- remove_extra_newlines(md)
   }
 
-  cat(md, file = to, sep = "")
+  brio::write_lines(paste(md, collapse = ""), path = to)
   return(to)
 }
 
@@ -322,7 +322,7 @@ convert_docx_to_md <- function(docx,
     options = opts,
     verbose = verbose
   )
-  return(readfile(md_tmp))
+  return(brio::read_file(md_tmp))
 }
 
 
