@@ -331,6 +331,7 @@ convert_docx_to_md <- function(docx,
 #' to a temporary file and returns its path
 #' Maybe this should be refactored to use officer::read_docx and work
 #' like other functions in officer, e.g., body_sdt_to_ins()
+#' @noRd
 preprocess_docx <- function(docx, outfile = tempfile(fileext = ".docx")) {
   docx <- to_docx(docx)
   docx <- body_contentcontrols_to_insertions(docx)

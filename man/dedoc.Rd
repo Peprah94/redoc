@@ -8,7 +8,7 @@ dedoc(
   docx,
   to = NULL,
   dir = ".",
-  track_changes = "comments_only",
+  track_changes = "all",
   block_missing = "comment",
   inline_missing = "omit",
   wrap = getOption("redoc.wrap", 80),

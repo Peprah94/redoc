@@ -34,6 +34,6 @@ md_to_openxml <- function(text, simplify = TRUE,
 }
 
 #' @exportS3Method
-print.xmltext <- function(x) {
+print.xmltext <- function(x, ...) {
   cat(x)
 }
