@@ -1,16 +1,14 @@
-source(test_path("fixtures", "roundtrip.R"))
 
 test_rmds <- c(
   redoc_example_rmd(),
   list.files(test_path("test_rmds"), "\\.Rmd$", full.names = TRUE)
 )
 
-dir.create(artifacts_dir <- tempfile("redoc-artifacts"), recursive = TRUE)
-message("Artifacts in: ", artifacts_dir)
+
 
 
 for(rmd in test_rmds) {
- 
+
   rmdir <- test_roundtrip(rmd, artifacts_dir)
 
   test_that(paste0("Rendering succeeds:", basename(rmd)), {
@@ -36,8 +34,36 @@ for(rmd in test_rmds) {
 
   test_that(paste0("R Markdown is preserved in the roundtrip:", basename(rmd)), {
     roundtrip <- file.path(rmdir, paste0(basename(tools::file_path_sans_ext(rmd)), ".roundtrip.Rmd"))
-    expect_equal(readLines(rmd, warn = FALSE), readLines(roundtrip, warn = FALSE))
-    expect_equal(pandoc_ast(rmd), pandoc_ast(roundtrip))
+    lines_comparison <- waldo::compare(
+      readLines(rmd, warn = FALSE),
+      readLines(roundtrip, warn = FALSE),
+      max_diffs = 3
+    )
+    ast_comparison <- waldo::compare(
+      pandoc_ast(rmd),
+      pandoc_ast(roundtrip),
+      max_diffs = 3)
+  # Function to truncate output to first few lines
+  truncate_comparison <- function(comparison, max_lines = 10) {
+    if (length(comparison) == 0) return("")
+
+    # Capture the output when printing the comparison
+    captured <- capture.output(cat(comparison, sep = "\n"))
+
+    # Take only the first few lines
+    if (length(captured) > max_lines) {
+      truncated <- c(head(captured, max_lines), paste("... [", length(captured) - max_lines, "more lines truncated]"))
+    } else {
+      truncated <- captured
+    }
+
+    paste(truncated, collapse = "\n")
+  }
+
+  expect(length(lines_comparison) == 0,
+         failure_message = truncate_comparison(lines_comparison, max_lines = 8))
+  expect(length(ast_comparison) == 0,
+         failure_message = truncate_comparison(ast_comparison, max_lines = 8))
   })
 
   }
