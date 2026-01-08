@@ -12,7 +12,7 @@ redoc(
   comment_author = NULL,
   keep_md = FALSE,
   wrappers = list(htmlcommentwrap, latexwrap, rawblockwrap, rawspanwrap, cmwrap,
-    citationwrap),
+    citationwrap, crossrefwrap),
   diagnostics = TRUE,
   ...
 )

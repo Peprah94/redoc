@@ -8,6 +8,7 @@
 \alias{rawblockwrap}
 \alias{rawspanwrap}
 \alias{citationwrap}
+\alias{crossrefwrap}
 \title{Make a wrapper function}
 \usage{
 make_wrapper(label, regex, type = c("block", "inline"))

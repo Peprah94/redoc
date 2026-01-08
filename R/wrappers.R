@@ -80,9 +80,17 @@ make_wrapper <- function (label,
     container_wrapper <- spanwrap
   wrapper <- function(rmd) {
     chunks <- list()
+    if(!label %in% "citation"){
     finds <- stringr::str_locate_all(rmd$text, regex)[[1]]
+    } else {
+      finds1 <- stringr::str_locate_all(rmd$text, regex)[[1]]
+      regex2 <- "(?:\\\\@ref\\(.*?\\))"
+      finds2 <- stringr::str_locate_all(rmd$text, regex2)[[1]]
+
+      finds <- rbind(finds1, finds2)
+    }
     if (nrow(finds) == 0) return(rmd)
-    
+
     for (i in seq_len(nrow(finds))){
       counter <- nrow(finds) - i + 1
       code <- substr(rmd$text,
@@ -102,11 +110,11 @@ make_wrapper <- function (label,
       stringi::stri_sub(rmd$text,
                         finds[counter, 1],
                         finds[counter, 2]) <- container_wrapper(code, name)
-      
+
     }
     rmd$code <- c(rmd$code, rev(chunks))
     rmd
-    
+
   }
   class(wrapper) <- "redoc_wrapper"
   attr(wrapper, "args") <- list(label = label, regex = regex,
