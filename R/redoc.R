@@ -34,7 +34,7 @@ redoc <- function(highlight_outputs = FALSE, wrap = getOption("redoc.wrap", 80),
                   wrappers = list(
                     htmlcommentwrap, latexwrap,
                     rawblockwrap, rawspanwrap,
-                    cmwrap, citationwrap, crossrefwrap
+                    cmwrap, citationwrap
                   ),
                   diagnostics = TRUE,
                   ...) {

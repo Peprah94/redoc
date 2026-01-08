@@ -80,15 +80,9 @@ make_wrapper <- function (label,
     container_wrapper <- spanwrap
   wrapper <- function(rmd) {
     chunks <- list()
-    if(!label %in% "citation"){
-    finds <- stringr::str_locate_all(rmd$text, regex)[[1]]
-    } else {
-      finds1 <- stringr::str_locate_all(rmd$text, regex)[[1]]
-      regex2 <- "(?:\\\\@ref\\(.*?\\))"
-      finds2 <- stringr::str_locate_all(rmd$text, regex2)[[1]]
 
-      finds <- rbind(finds1, finds2)
-    }
+    finds <- stringr::str_locate_all(rmd$text, regex)[[1]]
+
     if (nrow(finds) == 0) return(rmd)
 
     for (i in seq_len(nrow(finds))){
@@ -161,13 +155,6 @@ rawspanwrap <- make_wrapper(
 #' @rdname make_wrapper
 citationwrap <- make_wrapper(
   label = "citation",
-  regex = "(?:@\\w+|\\[.*?-?@\\w+.*?\\](?!\\[\\(\\{))",
+  regex = "(?:@(?!ref\\()\\w+|\\[.*?-?@(?!ref\\()\\w+.*?](?!\\[\\(\\{)|\\\\@ref\\(.*?\\))",
   type = "inline")
 
-#' @export
-#' @usage NULL
-#' @rdname make_wrapper
-crossrefwrap <- make_wrapper(
-  label = "crossref",
-  regex = "(?:\\\\@ref\\(.*?\\))",
-  type = "inline")
