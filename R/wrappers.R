@@ -70,47 +70,50 @@
 #'     regex = "(?:@\\w+|\\[.*?-?@\\w+.*?\\](?!\\[\\(\\{))",
 #'     type = "inline")
 
-make_wrapper <- function(label, regex, type  = c("block", "inline")) {
+make_wrapper <- function (label,
+                          regex,
+                          type = c("block", "inline")){
   type <- match.arg(type)
   if (type == "block")
     container_wrapper <- divwrap
   else if (type == "inline")
     container_wrapper <- spanwrap
-
   wrapper <- function(rmd) {
-
-    counter <- 0
-    chunks <- lapply(
-      stri_extract_all_regex(rmd$text, regex)[[1]],
-      function(x) {
-        counter <<- counter + 1
-        list(code = x,
+    chunks <- list()
+    finds <- stringr::str_locate_all(rmd$text, regex)[[1]]
+    if (nrow(finds) == 0) return(rmd)
+    
+    for (i in seq_len(nrow(finds))){
+      counter <- nrow(finds) - i + 1
+      code <- substr(rmd$text,
+                     start = finds[counter, 1],
+                     stop = finds[counter, 2])
+      name <- stringi::stri_join(prefix,
+                                 label, "-", counter)
+      lineno <- stri_count_lines(substr(rmd$text,
+                                        0,
+                                        finds[counter, 1] - 1))
+      chunks[[i]] <-
+        list(code = code,
              label = label,
              type = type,
-             name = stri_join(prefix, label, "-", counter))
-      })
-
-    if (length(chunks) == 0 || (length(chunks) == 1 && any(is.na(chunks[[1]]))))
-      return(rmd)
-
-    for (i in seq_along(chunks)) {
-      chunks[[i]]$lineno <- stri_lineno_first_fixed(rmd$text, chunks[[i]]$code)
-      rmd$text <- stri_replace_first_fixed(rmd$text,
-                                           chunks[[i]]$code,
-                                           container_wrapper(
-                                             chunks[[i]]$code,
-                                             chunks[[i]]$name)
-                                           )
+             name  = name,
+             lineno = lineno)
+      stringi::stri_sub(rmd$text,
+                        finds[counter, 1],
+                        finds[counter, 2]) <- container_wrapper(code, name)
+      
     }
-    rmd$code <- c(rmd$code, chunks)
+    rmd$code <- c(rmd$code, rev(chunks))
     rmd
+    
   }
-
   class(wrapper) <- "redoc_wrapper"
-  attr(wrapper, "args") <- list(label = label, regex = regex, type = type)
+  attr(wrapper, "args") <- list(label = label, regex = regex1,
+                                type = type)
   return(wrapper)
-
 }
+
 
 
 #' @export
@@ -151,4 +154,12 @@ rawspanwrap <- make_wrapper(
 citationwrap <- make_wrapper(
   label = "citation",
   regex = "(?:@\\w+|\\[.*?-?@\\w+.*?\\](?!\\[\\(\\{))",
+  type = "inline")
+
+#' @export
+#' @usage NULL
+#' @rdname make_wrapper
+crossrefwrap <- make_wrapper(
+  label = "crossref",
+  regex = "(?:\\\\@ref\\(.*?\\))",
   type = "inline")
