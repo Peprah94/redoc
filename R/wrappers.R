@@ -109,7 +109,7 @@ make_wrapper <- function (label,
     
   }
   class(wrapper) <- "redoc_wrapper"
-  attr(wrapper, "args") <- list(label = label, regex = regex1,
+  attr(wrapper, "args") <- list(label = label, regex = regex,
                                 type = type)
   return(wrapper)
 }
